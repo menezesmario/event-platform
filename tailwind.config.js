@@ -5,6 +5,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: 'Roboto, sans-serif',
+      },
       colors: {
         green: {
           300: '#00b3je',
@@ -12,7 +15,7 @@ module.exports = {
           700: '#015f43',
         },
         blue: {
-          500: '#fba94c',          
+          500: '#81D8F7',          
         },
         orange: {
           500: '#fba94c',
