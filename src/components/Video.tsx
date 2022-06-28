@@ -1,15 +1,63 @@
 import { DefaultUi, Player, Youtube } from "@vime/react";
+import { gql, useQuery } from "@apollo/client";
 import { CaretRight, DiscordLogo, FileArrowDown, Lightning } from "phosphor-react";
 
 import '@vime/core/themes/default.css'
 
-export function Video() {
+const GET_LESSON_BY_SLUG_QUERY = gql `
+    query GetLessonBySlug($slug: String) {
+  lesson(where: {slug: ""}) {
+    title
+    videoId
+    description
+    teacher {
+      bio
+      avatarURL
+      name
+    }
+  }
+}
+`
+
+interface GetLessonBySlugResponse {
+    lesson: {
+        title: string;
+        videId: string;
+        description: string;
+        teacher: {
+            bio: string;
+            avatarURL: string;
+            name: string;
+        }
+    }
+}
+
+interface VideoProps {
+    lessonSlug: string;
+}
+
+export function Video(props: VideoProps) {
+
+    const { data } = useQuery<GetLessonBySlugResponse>(GET_LESSON_BY_SLUG_QUERY, {
+        variables: {
+            slug: props.lessonSlug,
+        }
+    })
+
+    if (!data) {
+        return (
+            <div className="flex-1">
+                <p>Carregando...</p>
+            </div>
+        )
+    }
+
     return (
         <div className="flex-1">
             <div className="bg-black flex justify-content">
                 <div className="h-full w-full max-w-[1188px] max-h-[68vh] aspect-video">
                     <Player>
-                        <Youtube videoId="SO4-izct7Mc" />
+                        <Youtube videoId={data.lesson.videId} />
                         <DefaultUi />
 
                     </Player>
@@ -20,21 +68,21 @@ export function Video() {
                 <div className="flex items-start gap-16">
                     <div className="flex-1">
                         <h1>
-                            Aula 01 - Abertura do Ignite Lab
+                            {data.lesson.title}
                         </h1>
                         <p className="mt-4 text-gray-200 leading-relaxed">
-                            nessa aula vamos dar início ao projeto criando a estrutura base da aplicação utilizando REACT JS HTML CSS
+                            {data.lesson.description}
                         </p>
 
                         <div className="flex items-center gap-4 mt-6">
                             <img 
                                 className="h-16 w-16 rounded-full border-2 border-blue-500"
-                                src="https://github.com/menezesmario.png"
+                                src={data.lesson.teacher.avatarURL}
                                 alt=""
                             />
                             <div>
-                                <strong className="font-bold text-2xl block">Mário Menezes</strong>
-                                <span className="text-gray-200 text-sm block">Web Developer</span>
+                                <strong className="font-bold text-2xl block">{data.lesson.teacher.name}</strong>
+                                <span className="text-gray-200 text-sm block">{data.lesson.teacher.bio}</span>
                             </div>
                         </div>
                     </div>
